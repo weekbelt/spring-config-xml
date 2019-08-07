@@ -116,3 +116,96 @@ XML을 이용한 Spring 설정
         }
     }
     ~~~
+    
+Java Config를 이용한 Spring 설정
+================================
+
+1. 설정을 위한 ApplicationConfig.class 생성
+    ~~~
+    @Configuration
+    public class ApplicationConfig {
+        @Bean
+        public Car car(Engine e){
+            Car c = new Car();
+            c.setEngine(e);
+            return c;
+        }
+    
+        @Bean
+        public Engine engine(){
+            return new Engine();
+        }
+    
+    }
+    ~~~
+2. ApplicationConfig.class로 설정한 빈을 실행할 클래스 생성
+    ~~~
+    public class ApplicationContextExam03 {
+        public static void main(String[] args) {
+            ApplicationContext ac = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+    
+            Car car = (Car) ac.getBean("car");
+            car.run();
+    
+        }
+    }
+    ~~~
+
+어노테이션을 이용한 Java Config 설정 방법
+=================================
+
+1. 설정을 위한 ApplicationConfig2.class 생성
+    * ComponentScan어노테이션을 추가해 인자의 패키지경로 하위에 있는 @Component, @Controller, @Service, @Repository등을 빈으로 설정
+    ~~~
+    @Configuration
+    @ComponentScan("kr.or.connct")
+    public class ApplicationConfig2 {
+    }
+    ~~~
+
+2. ApplicationConfig2.class에서 ComponentScan어노테이션에 설정한 패키지 경로 하위의 클래스들을 빈으로 등록하기위해 Engine.class, Car.class에 Component어노테이션을 추가
+    * @Autowired는 컨테이너에 Engine이 존재한다면 자동으로 주입할수 있게 하는 어노테이션이다.
+    ~~~
+    @Component
+    public class Car {
+    
+        @Autowired
+        private Engine v8;
+    
+        public Car() {
+            System.out.println("Car 생성자");
+        }
+    
+        public void run() {
+            System.out.println("엔진을 이용하여 달립니다.");
+            v8.exec();
+        }
+    
+    }
+    ~~~ 
+    
+    ~~~
+    @Component
+    public class Engine {
+        public Engine() {
+            System.out.println("Engine 생성자");
+        }
+    
+        public void exec() {
+            System.out.println("엔진이 동작합니다.");
+        }
+    }
+
+    ~~~
+3. 실행 클래스 생성
+    ~~~
+    public class ApplicationContextExam04 {
+        public static void main(String[] args) {
+            ApplicationContext ac = new AnnotationConfigApplicationContext(ApplicationConfig2.class);
+    
+            Car car = (Car) ac.getBean(Car.class);
+            car.run();
+    
+        }
+    }
+    ~~~
