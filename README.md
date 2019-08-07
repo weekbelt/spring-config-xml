@@ -51,3 +51,68 @@ XML을 이용한 Spring 설정
     }
     ~~~
     ApplicationContext를 생성하게되면 applicationContext.xml에 등록한 빈의 정보를 모두 일어들여 메모리에 올려 놓는다.
+
+6. 의존성 주입 확인
+    * 예시 클래스로 Engine.class와 Car.class 생성
+        * Engine.class
+        ~~~
+        public class Engine {
+            public Engine() {
+                System.out.println("Engine 생성자");
+            }
+        
+            public void exec() {
+                System.out.println("엔진이 동작합니다.");
+            }
+        }
+        ~~~
+        * Car.class
+        ~~~
+        public class Car {
+            private Engine v8;
+        
+            public Car() {
+                System.out.println("Car 생성자");
+            }
+        
+            public void setEngine(Engine e) {
+                this.v8 = e;
+            }
+        
+            public void run() {
+                System.out.println("엔진을 이용하여 달립니다.");
+                v8.exec();
+            }
+        }
+        ~~~
+    * Engine클래스와 Car클래스를 applicationContext.xml에 빈으로 등록
+    ~~~
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+        <bean id="userBean" class="kr.or.connct.UserBean"></bean>
+        <bean id="e" class="kr.or.connct.Engine"/>
+        <bean id="c" class="kr.or.connct.Car">
+            <property name="engine" ref="e"></property>
+        </bean>
+    
+    </beans>
+    ~~~
+    
+    * 실행 확인하기 위한 클래스생성
+    ~~~
+    import org.springframework.context.ApplicationContext;
+    import org.springframework.context.support.ClassPathXmlApplicationContext;
+    
+    public class ApplicationContextExam02 {
+        public static void main(String[] args) {
+            ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+    
+            Car car = (Car) ac.getBean("c");
+            car.run();
+    
+        }
+    }
+    ~~~
